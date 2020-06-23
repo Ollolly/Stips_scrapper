@@ -23,7 +23,7 @@ class StipsScrapping:
         self.driver = webdriver.Firefox()
         self.driver.implicitly_wait(30)
         self.scroll_pause_time = 25
-        self.page_load_time = 3
+        self.page_load_time = 6
         self.channels = CHANNELS
         self.base_url = 'https://stips.co.il'
         self.username = username
@@ -122,7 +122,7 @@ class StipsScrapping:
     def _get_profile_data(source):
         """ The function author username and id. """
         user_data = source.find('div', {'class': 'name'})
-        user_name = user_data.text
+        user_name = StipsScrapping._get_text_with_newlines(user_data)
         user_id = None
         user_href = BeautifulSoup(str(user_data), 'lxml').find('a')
         if user_href is not None:
@@ -133,6 +133,12 @@ class StipsScrapping:
                 logging.getLogger(__name__).debug(f'Failed to get user id, url : {user_href}')
 
         return user_name, user_id
+
+    @staticmethod
+    def _get_text_with_newlines(soup):
+        new_soup = str(soup).replace('<br/>', '\n')
+        return BeautifulSoup(new_soup, 'lxml').text
+
 
     def _get_question_data(self, source):
         """
@@ -146,10 +152,10 @@ class StipsScrapping:
         if data is None:
             return None
 
-        record['data'] = data.text
+        record['data'] = self._get_text_with_newlines(data)
         description = soup.find('div', {'class': 'text-content ng-star-inserted'})
         if description:
-            record['data'] += ' ' + description.text
+            record['data'] += ' ' + self._get_text_with_newlines(description)
 
         user_name, user_id = self._get_profile_data(soup)
         record['user_name'] = user_name
@@ -166,9 +172,8 @@ class StipsScrapping:
         elems = etree.HTML(source).xpath(path)
         for elem in elems:
             soup = BeautifulSoup(etree.tostring(elem), 'lxml')
-            data = soup.find('div', {'class': 'content ng-star-inserted'}).text
-            if data is None:
-                continue
+            data = soup.find('div', {'class': 'content ng-star-inserted'})
+            data = self._get_text_with_newlines(data)
             record = {'data': data}
             user_name, user_id = self._get_profile_data(soup)
             record['user_name'] = user_name
