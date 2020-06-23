@@ -91,7 +91,7 @@ class StipsScrapping:
         """
         The function returns post title, description, post/comment creation time, comments,
         usernames and users id.
-        rtype list[int, datetime, list of dictionaries]
+        rtype dictionary
         """
         logging.getLogger(__name__).debug(f'Scrapping post : {url}')
         try:
@@ -116,7 +116,7 @@ class StipsScrapping:
         # Needed for recreation creation time: posts/comments created in the last day are considered
         # from the moment of creation
         now = datetime.now().strftime('%H:%M:%S')
-        return post_id, now, data
+        return {'post_id': post_id, 'scp_time': now, 'data': data}
 
     @staticmethod
     def _get_profile_data(source):
