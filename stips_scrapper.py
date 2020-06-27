@@ -22,8 +22,8 @@ class StipsScrapping:
     def __init__(self, username, password):
         self.driver = webdriver.Firefox()
         self.driver.implicitly_wait(30)
-        self.scroll_pause_time = 25
-        self.page_load_time = 6
+        self.scroll_pause_time = 30
+        self.page_load_time = 7
         self.channels = CHANNELS
         self.base_url = 'https://stips.co.il'
         self.username = username
@@ -115,7 +115,7 @@ class StipsScrapping:
 
         # Needed for recreation creation time: posts/comments created in the last day are considered
         # from the moment of creation
-        now = datetime.now().strftime('%H:%M:%S')
+        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         return {'post_id': post_id, 'scp_time': now, 'data': data}
 
     @staticmethod
